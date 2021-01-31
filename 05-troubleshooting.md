@@ -56,33 +56,28 @@ Final migrations have two Backup and two Restore objects. The first Backup objec
 
 The first Restore restores these storage objects on the target cluster. The final Restore restores the original application Backup to the target cluster.
 
-## Querying the migration resources from the CLI
+## Debugging migration resources from the command line
 
 The migration debug tree can be viewed and traced by querying specific label selectors.
 
 - To view all `migmigration` objects associated with the `test` plan:
-
   ```sh
   $ oc get migmigration -l 'migration.openshift.io/migplan-name=test'
   ```
 
   **Example output**
-
   ```
   NAME                                  READY  PLAN  STAGE  ITINERARY  PHASE
   09a8bf20-fdc5-11ea-a447-cb5249018d21         test  false  Final      Completed
   ```
-
   The columns display the associated plan name, itinerary step, and phase.
 
 - To view `backup` objects:
-
   ```sh
   $ oc get backup -n openshift-migration
   ```
 
   **Example output**
-
   ```
   NAME                                   AGE
   88435fe0-c9f8-11e9-85e6-5d593ce65e10   6m42s
@@ -91,14 +86,13 @@ The migration debug tree can be viewed and traced by querying specific label sel
   Use the same command to view `restore` objects.
 
 - To inspect a `backup` object:
-
   ```sh
   $ oc describe backup 88435fe0-c9f8-11e9-85e6-5d593ce65e10 -n openshift-migration
   ```
 
 See [Viewing migration custom resources](https://docs.openshift.com/container-platform/4.6/migration/migrating_3_4/troubleshooting-3-4.html#migration-viewing-migration-crs_migrating-3-4) for more information.
 
-## Accessing more information about Velero Resources using the 'velero' CLI tool
+## Debugging Velero resources with the `velero` tool from the command line
 
 In addition to viewing the Backup and Restore resources, it is possible to obtain more information by invoking the `velero` binary.  This utility will look at a lower level of information stored in the object storage associated with each backup or restore.  This may help to show why a particular resource was not restored or give more context as to why a Velero operation failed.
 
@@ -107,14 +101,14 @@ MTC ships the `velero` binary in the running velero container, a user may access
 ```sh
   $ oc exec velero-$podname -n openshift-migration -- ./velero --help
 
-  or 
+  or
 
   $ oc exec $(oc get pods -n openshift-migration -o name | grep velero) -n openshift-migration -- ./velero --help
 ```
 
-- `velero {backup|restore} describe $resourceid` 
+- `velero {backup|restore} describe $resourceid`
   - `describe`: will provide a summary of warnings and errors Velero saw while processing the action
-    - example: `velero backup describe 0e44ae00-5dc3-11eb-9ca8-df7e5254778b-2d8ql` 
+    - example: `velero backup describe 0e44ae00-5dc3-11eb-9ca8-df7e5254778b-2d8ql`
       - Where '0e44ae00-5dc3-11eb-9ca8-df7e5254778b-2d8ql' is the name of a Velero Backup custom resource
 
 - `velero {backup|restore} logs $resourceid`
@@ -161,7 +155,7 @@ status:
 [full output](https://gist.github.com/9a3ec8f51e12b84f8bb995286223bdda)
 ```sh
 
-$ oc exec $(oc get pods -n openshift-migration -o name | grep velero) -n openshift-migration -- ./velero restore describe ccc7c2d0-6017-11eb-afab-85d0007f5a19-x4lbf 
+$ oc exec $(oc get pods -n openshift-migration -o name | grep velero) -n openshift-migration -- ./velero restore describe ccc7c2d0-6017-11eb-afab-85d0007f5a19-x4lbf
 
 .....
 
